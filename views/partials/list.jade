@@ -1,4 +1,13 @@
-p This is the partial for view 1.
-ul
-	li(ng-repeat='item in list')
-		[{{item.i}}]
+h1 List
+table
+	tr(ng-repeat='item in list')
+		td
+			h2 title : {{item.title}}
+			p author : {{item.author}}
+			p description : {{item.description}}
+			p votes : {{item.votes}}
+			p link : {{item.link}}
+			p comments : {{item.comments}}
+			p status : {{item.status}}
+			a(href='detail/{{item._id}}') detail
+			hr

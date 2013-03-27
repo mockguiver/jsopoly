@@ -2,13 +2,17 @@
 
 /* Controllers */
 
-function altCtrl($scope, socket, $routeParams, $window) {
+function altCtrl($scope, socket, $routeParams, $window, $location) {
 
-	$scope.sync = function (type) {
-		socket.emit('chgfilter', {type: type});
+	$scope.sync = function (status) {
+		socket.emit('chgfilter', {status: status});
+
+		// if we are out of list view we return to that view
+		if ($location.path() != '/') { $location.path('/');	}
+
 	}
 }
-altCtrl.$inject = ['$scope', 'socket','$routeParams','$window'];
+altCtrl.$inject = ['$scope', 'socket','$routeParams','$window','$location'];
 
 function listCtrl($scope, socket, $routeParams, $window) {
 
@@ -23,6 +27,47 @@ function listCtrl($scope, socket, $routeParams, $window) {
 }
 listCtrl.$inject = ['$scope', 'socket','$routeParams','$window'];
 
-function detailCtrl($scope, socket) {
+function putCtrl($scope,socket) {
+
+	socket.on('post:ok', function(data) {
+		$scope.result = "OK !"
+	});
+
+	$scope.put = function () {
+		
+		var post = {
+			author: $scope.author,
+			title: $scope.title,
+			description: $scope.description, 
+			votes: 0,
+			link: $scope.link,
+			comments: [],
+			status: 'upc'
+		}
+
+		$scope.action = 'Inserted ... ';
+		socket.emit('put:post', post);
+
+	}
 }
-detailCtrl.$inject = ['$scope', 'socket'];
+putCtrl.$inject = ['$scope','socket'];
+
+
+function detailCtrl($scope, socket, $routeParams) {
+
+	socket.on('get:post', function(data) {
+
+		$scope.id = data._id;
+		$scope.author = data.author;
+		$scope.date = data.date;
+		$scope.title = data.title;
+		$scope.description = data.description; 
+		$scope.votes = data.votes;
+		$scope.link = data.link;
+		$scope.comments = data.comments;
+
+	});
+
+	socket.emit('get:post', {id: $routeParams.id});
+}
+detailCtrl.$inject = ['$scope', 'socket','$routeParams'];

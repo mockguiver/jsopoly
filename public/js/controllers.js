@@ -75,12 +75,23 @@ detailCtrl.$inject = ['$scope', 'socket','$routeParams'];
 function loginCtrl($scope,socket,$routeParams,store) {
 
 	socket.on('login',function(data) {
-		store.save({username: data.username});
-	})
+		store.save({username: data.username,session: data.session});
+        $scope.action = 'Loggin ...';
+        $scope.result = data.result;
+    })
+
+    socket.on('register', function (data) {
+        $scope.action = 'Registered ...';
+        $scope.result = data.result;
+    })
 
 	$scope.login = function () {
-		socket.emit('login',{username:$routeParams.username, password: $routeParams.password});
+		socket.emit('login',{username:$scope.username, password: $scope.password});
 	}
 
+    $scope.register = function() {
+        socket.emit('register',{username:$scope.username, password: $scope.password});
+    }
+
 }
-loginCtrl.$inject = ['$scope','socket','$routeParams'];
+loginCtrl.$inject = ['$scope','socket','$routeParams','store'];

@@ -8,18 +8,29 @@ mongoose.connect('localhost', '_altDB');
 
 // Schema
 var postModel = {
-	author: String,
-	date: { type: Date, default: Date.now },
-	title: String,
-	description: String, 
-	votes: Number,
-	link: String,
-	comments: [{body:String, date:Date, author:String}],
-	status: String
+    author: String,
+    date: { type: Date, default: Date.now },
+    title: String,
+    description: String,
+    votes: Number,
+    link: String,
+    comments: [
+        {body: String, date: Date, author: String}
+    ],
+    status: String
+};
+
+var userModel = {
+    username: String,
+    password: String,
+    karma: Number,
+    session: String
 }
 
 // Models
 var Post = mongoose.model('Post',postModel);
+var User = mongoose.model('User',userModel);
+
 
 module.exports = function (socket) {
 
@@ -45,5 +56,29 @@ module.exports = function (socket) {
 			socket.emit('get:post', doc);
 		})
 	})
+
+	socket.on('login', function(data) {
+        User.findOne({username:data.username}, function (err,user) {
+            if (!err && user) {
+                if (user.password != data.password) {
+                    socket.emit('login', {result: 'error - worng password'});
+                } else {
+                    user.session = 'inventedsession';
+                    user.save();
+                    socket.emit('login', {username: data.username, session: user.session, result: 'OK!'});
+                }
+            } else {
+                socket.emit('login', {result: 'error - no user'});
+            }
+        })
+	})
+
+    socket.on('register', function(data) {
+        data.karma=0;
+        data.session = 'logged';
+        var user = new User(data);
+        user.save();
+        socket.emit('register',{result:'OK!'});
+    })
 
 };

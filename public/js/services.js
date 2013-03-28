@@ -29,4 +29,14 @@ angular.module('alt.services', []).
         })
       }
     };
+  }).
+  factory('store',function ($window) {
+    return {
+      save: function (item) {
+        $window.localStorage.setItem('alt',JSON.stringify(item));
+      },
+      get: function () {
+        return JSON.parse($window.localStorage.getItem('alt'));
+      }
+    }
   });

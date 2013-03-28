@@ -71,3 +71,16 @@ function detailCtrl($scope, socket, $routeParams) {
 	socket.emit('get:post', {id: $routeParams.id});
 }
 detailCtrl.$inject = ['$scope', 'socket','$routeParams'];
+
+function loginCtrl($scope,socket,$routeParams,store) {
+
+	socket.on('login',function(data) {
+		store.save({username: data.username});
+	})
+
+	$scope.login = function () {
+		socket.emit('login',{username:$routeParams.username, password: $routeParams.password});
+	}
+
+}
+loginCtrl.$inject = ['$scope','socket','$routeParams'];

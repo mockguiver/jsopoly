@@ -29,6 +29,8 @@ listCtrl.$inject = ['$scope', 'socket','$routeParams','$window'];
 
 function submitCtrl($scope,socket) {
 
+    $scope.phase2 = false;
+
 	socket.on('post:ok', function(data) {
 		$scope.result = "OK !"
 	});
@@ -49,6 +51,10 @@ function submitCtrl($scope,socket) {
 		socket.emit('put:post', post);
 
 	}
+
+    $scope.togglePhase = function () {
+        $scope.phase2 = !$scope.phase2;
+    }
 }
 submitCtrl.$inject = ['$scope','socket'];
 

@@ -1,12 +1,56 @@
-h1 Add new post
-form
-	label title
-	input(type='text', ng-model='title')
-	label description
-	input(type='textarea', ng-model='description')
-	label link
-	input(type='text', ng-model='link')
-	input(type='hidden', ng-model='author', value='sam')
-	input(type='submit', value='Post!', ng-click='put()')
+div(ng-hide='phase2')
+  div.page-header
+    h2 Submit a new post
 
-h2 {{ action }} {{ result }} 
+  h3
+    strong Please follow a few simple guidelines to make this site a better place:
+  ul
+    li
+      strong Quality Content:
+      p Is your story relevant to the site?
+    li
+      strong Link Directly to the Source
+      p Save people time by linking directly to the original news story.
+    li
+      strong Search First
+      p Avoid duplicate submissions by searching to make sure someone else has not submitted the story already.
+    li
+      strong Be Descriptive
+      p You are the story editor, so explain what it is and why it is cool.
+
+  h3
+    strong Post Source
+
+  p Unique Post URL:
+  form
+    input(type='text', length='120',ng-model='link')
+    div
+      button.btn.btn-success(type='button',ng-click='phase2=true;', value='Continue') Continue
+
+div(ng-show='phase2')
+  div.page-header
+    h2 Post details
+  form
+    label Post Title
+    input(type='text',length='200',ng-model='title')
+    label Description
+    textarea(rows=6, cols= 260, ng-model='description')
+    div
+      button.btn.btn-success(type='submit', value='Post!', ng-click='put()') Submit >
+
+
+  div.page-header
+    h2 Preview
+
+  div.row-fluid
+    div.span1.vote
+      | 1
+      br
+      button.btn.btn-warning Vote
+    div.span9
+      h2
+        a(href='{{item.link}}') {{title}}
+      small {{author}}
+      p {{description}}
+
+h2 {{ action }} {{ result }}

@@ -1,9 +1,24 @@
-h1 Register form
-form
+div.span4
+  h2 Login
+  p Have an account ?
+  form
     label Username
     input(type='text', ng-model='username')
+    label Email
+    input(type='text', ng-model='email')
     label Password
     input(type='password', ng-model='password')
-    input(type='submit', value='Register', ng-click='register()')
+    label Verify Password
+    input(type='password', ng-model='vpassword')
+    div
+      button.btn.btn-success(type='submit', value='Login', ng-click='register()') Register
+div.span4
+  h2 Join Us
+  p Don't just read the content, submit your own and participate by becoming a free member. By registering you unlock special privileges reserved for members such as...
+  ul
+    li Submit content for others to vote on
+    li Vote on articles that interest you
+    li View your voting and comment activity from your profile
 
-h2 {{ action }} {{ result }}
+
+h2 {{ action }} {{ result }} 

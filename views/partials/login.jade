@@ -1,9 +1,26 @@
-h1 Login form
-form
-	label Username
-	input(type='text', ng-model='username')
-	label Password
-	input(type='password', ng-model='password')
-	input(type='submit', value='Login', ng-click='login()')
+div.span4
+  h2 Login
+  p Have an account ?
+  form
+    label Username
+    input(type='text', ng-model='username')
+    label Password
+    input(type='password', ng-model='password')
+    div
+      button.btn.btn-success(type='submit', value='Login', ng-click='login()') Sign in
+div.span4
+  h2 Forgotten Password
+  p Forget your password? Enter you email address and we will send instructions on how to reset it.
+  form
+    label Email
+    input(type='text', ng-model='username')
+    div
+      button.btn.btn-success(type='submit', value='Login', ng-click='forgotten()') Continue
+
+hr
+div.span8
+  h2 Register an account
+  p New User ?
+  a.btn.btn-success(href='register') Create a new Account
 
 h2 {{ action }} {{ result }} 

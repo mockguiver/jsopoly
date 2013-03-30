@@ -5,7 +5,7 @@ block body
 
     div.navbar.navbar-static-top.navbar-inverse
       div.navbar-inner
-        div.container-fluid
+        div.container
           a.brand(href='#') JSopoly
 
           ul.nav
@@ -52,15 +52,19 @@ block body
                 li
                   a(href='#') Logout
 
-    div.container-fluid
-      div.row-fluid
+    div.container
+      div.row
         div.span9
           div(ng-view)
         div.span3
-          p Barra lateral
-
-    div
-      p footer
+          div.lateral
+            div
+              form
+                input.span2(type='text',ng-model='mySearch')
+                button.btn.btn-danger(style='height:29px;vertical-align:top;padding-top:5px;margin-left:5px;width:22%;',ng-click='search()') Go!
+            div
+              div.sectiontitle
+                a(href='about') What's Jsopoly?
 
   script(src='http://code.jquery.com/jquery-1.9.1.min.js')
   script(src='//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js')

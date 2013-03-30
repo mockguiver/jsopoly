@@ -1,29 +1,13 @@
 div.page-header
   h2 Actual News
 
-div.row-fluid
-  div.span2
-    div.votebox.votebox-upcoming
-      div.vote
-        div.votenumber
-          | 484
-        div.votebutton
-          button.btn.btn-success Vote
-
-  div.span7
-    p noticia
-
-
-    h1 List
-    table
-      tr(ng-repeat='item in list')
-        td
-          h2 title : {{item.title}}
-          p author : {{item.author}}
-          p description : {{item.description}}
-          p votes : {{item.votes}}
-          p link : {{item.link}}
-          p comments : {{item.comments}}
-          p status : {{item.status}}
-          a(href='detail/{{item._id}}') detail
-          hr
+div.row-fluid(ng-repeat='item in list')
+  div.span1.vote
+     | {{item.votes}}
+     br
+     button.btn.btn-warning Vote
+  div.span9
+    h2
+      a(href='{{item.link}}') {{item.title}}
+    small {{item.author}}
+    p {{item.description}}

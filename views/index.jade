@@ -2,22 +2,65 @@ extends layout
 
 block body
   div(ng-controller='altCtrl')
-    h2 Hello Sam !
-    ul.menu
-      li
-        a(href='#',ng-click="sync('top')",eat-click='eat-click') Top
-      li
-        a(href='#',ng-click="sync('pop')",eat-click='eat-click') Popular
-      li
-        a(href='#',ng-click="sync('upc')",eat-click='eat-click') Upcoming
-      li
-        a(href='put') Put
 
-    div(ng-view)
+    div.navbar.navbar-static-top.navbar-inverse
+      div.navbar-inner
+        div.container-fluid
+          a.brand(href='#') JSopoly
+
+          ul.nav
+            li
+              a(href='#',ng-click="sync('top')",eat-click='eat-click') Actual
+            li
+              a(href='#',ng-click="sync('pop')",eat-click='eat-click') Popular
+            li
+              a(href='#',ng-click="sync('upc')",eat-click='eat-click') Upcoming
+            li
+              a(href='submit') Submit
+
+            li.dropdown
+              a.dropdown-toggle(href='#',data-toggle='dropdown') Extra
+              ul.dropdown-menu
+                li
+                  a(href='#') Live
+                li
+                  a(href='#') Top sources
+                li
+                  a(href='#') Top Users
+
+          ul.nav.pull-right(ng-show='false')
+            li
+              a(href='register') Register
+            li.dropdown
+              a.dropdown-toggle(href='#',data-toggle='dropdown') Login
+              ul.dropdown-menu
+                li
+                  form
+                    div(style='margin:5px 15px 0 15px;')
+                      label Username
+                      input(ng-model='username',type='text')
+                      label Password
+                      input(ng-model='password',type='password')
+                      input(type='button', value='login', ng-click='login()')
+
+          ul.nav.pull-right(ng-show='true')
+            li.dropdown
+              a.dropdown-toggle(href='#',data-toggle='dropdown') Welcome {{user}}
+              ul.dropdown-menu
+                li
+                  a(href='#') Profile
+                li
+                  a(href='#') Logout
+
+    div.container-fluid
+      div.row-fluid
+        div.span9
+          div(ng-view)
+        div.span3
+          p Barra lateral
 
     div
-      | Angular Socket.io seed app: v
-      span(app-version)
+      p footer
 
   script(src='http://code.jquery.com/jquery-1.9.1.min.js')
   script(src='//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js')

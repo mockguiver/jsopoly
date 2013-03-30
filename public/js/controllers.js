@@ -27,7 +27,7 @@ function listCtrl($scope, socket, $routeParams, $window) {
 }
 listCtrl.$inject = ['$scope', 'socket','$routeParams','$window'];
 
-function putCtrl($scope,socket) {
+function submitCtrl($scope,socket) {
 
 	socket.on('post:ok', function(data) {
 		$scope.result = "OK !"
@@ -50,7 +50,7 @@ function putCtrl($scope,socket) {
 
 	}
 }
-putCtrl.$inject = ['$scope','socket'];
+submitCtrl.$inject = ['$scope','socket'];
 
 
 function detailCtrl($scope, socket, $routeParams) {

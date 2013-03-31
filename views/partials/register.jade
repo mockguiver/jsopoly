@@ -1,15 +1,19 @@
 div.span4
-  h2 Login
+  h2 Register
   p Have an account ?
   form
     label Username
     input(type='text', ng-model='username')
     label Email
     input(type='text', ng-model='email')
+    div
+        p.text-error {{mailError}}
     label Password
     input(type='password', ng-model='password')
     label Verify Password
     input(type='password', ng-model='vpassword')
+    div
+        p.text-error {{pwdError}}
     div
       button.btn.btn-success(type='submit', value='Login', ng-click='register()') Register
 div.span4

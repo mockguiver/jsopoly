@@ -61,11 +61,11 @@ module.exports = function (socket) {
         User.findOne({username:data.username}, function (err,user) {
             if (!err && user) {
                 if (user.password != data.password) {
-                    socket.emit('login', {result: 'error - worng password'});
+                    socket.emit('login', {error: true, result: 'error - worng password'});
                 } else {
                     user.session = 'inventedsession';
                     user.save();
-                    socket.emit('login', {username: data.username, session: user.session, result: 'OK!'});
+                    socket.emit('login', {error: false, username: data.username, session: user.session, result: 'OK!'});
                 }
             } else {
                 socket.emit('login', {result: 'error - no user'});

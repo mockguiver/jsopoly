@@ -7,7 +7,8 @@ var app = angular.module('alt', ['alt.filters', 'alt.services', 'alt.directives'
     $routeProvider.when('/', {templateUrl: 'partials/list', controller: listCtrl});
     $routeProvider.when('/submit', {templateUrl: 'partials/submit', controller: submitCtrl});
     $routeProvider.when('/login', {templateUrl: 'partials/login', controller: loginCtrl});
-    $routeProvider.when('/register', {templateUrl: 'partials/register', controller: loginCtrl});
+    $routeProvider.when('/about', {templateUrl: 'partials/about', controller: aboutCtrl});
+    $routeProvider.when('/register', {templateUrl: 'partials/register', controller: registerCtrl});
     $routeProvider.when('/detail/:id', {templateUrl: 'partials/detail', controller: detailCtrl});
     $routeProvider.otherwise({redirectTo: '/'});
     $locationProvider.html5Mode(true);

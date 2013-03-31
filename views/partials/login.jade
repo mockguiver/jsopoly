@@ -7,13 +7,17 @@ div.span4
     label Password
     input(type='password', ng-model='password')
     div
+      p.text-error {{result}}
+    div
       button.btn.btn-success(type='submit', value='Login', ng-click='login()') Sign in
 div.span4
   h2 Forgotten Password
   p Forget your password? Enter you email address and we will send instructions on how to reset it.
   form
     label Email
-    input(type='text', ng-model='username')
+    input(type='text', ng-model='fusername')
+    div
+      p.text-error {{result}}
     div
       button.btn.btn-success(type='submit', value='Login', ng-click='forgotten()') Continue
 

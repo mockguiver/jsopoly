@@ -6,7 +6,7 @@ block body
     div.navbar.navbar-static-top.navbar-inverse
       div.navbar-inner
         div.container
-          a.brand(href='#') JSopoly
+          a.brand(href='/') JSopoly
 
           ul.nav
             li
@@ -18,39 +18,15 @@ block body
             li
               a(href='submit') Submit
 
-            li.dropdown
-              a.dropdown-toggle(href='#',data-toggle='dropdown') Extra
-              ul.dropdown-menu
-                li
-                  a(href='#') Live
-                li
-                  a(href='#') Top sources
-                li
-                  a(href='#') Top Users
-
-          ul.nav.pull-right(ng-show='false')
+          ul.nav.pull-right(ng-hide='logged')
             li
               a(href='register') Register
-            li.dropdown
-              a.dropdown-toggle(href='#',data-toggle='dropdown') Login
-              ul.dropdown-menu
-                li
-                  form
-                    div(style='margin:5px 15px 0 15px;')
-                      label Username
-                      input(ng-model='username',type='text')
-                      label Password
-                      input(ng-model='password',type='password')
-                      input(type='button', value='login', ng-click='login()')
+            li
+              a(href='login') Login
 
-          ul.nav.pull-right(ng-show='true')
+          ul.nav.pull-right(ng-show='logged')
             li.dropdown
-              a.dropdown-toggle(href='#',data-toggle='dropdown') Welcome {{user}}
-              ul.dropdown-menu
-                li
-                  a(href='#') Profile
-                li
-                  a(href='#') Logout
+              a(href='profile') Welcome {{user}}
 
     div.container
       div.row
@@ -61,10 +37,23 @@ block body
             div
               form
                 input.span2(type='text',ng-model='mySearch')
-                button.btn.btn-danger(style='height:29px;vertical-align:top;padding-top:5px;margin-left:5px;width:22%;',ng-click='search()') Go!
+                button.btn.btn-danger(style='height:30px;vertical-align:top;padding-top:5px;margin-left:3px;width:22%;',ng-click='search()') Go!
             div
               div.sectiontitle
                 a(href='about') What's Jsopoly?
+              p Jsopoly is a Javascript community driven site to share news, experiences and informacion in a digg's style
+            div
+              p.sectiontitle Latest Comments
+              ul
+                li comment1
+                li comment2
+                li comment3
+            div
+              p.sectiontitle Upcoming News
+              ul
+                li Post 1
+                li Post 2
+                li Post 3
 
   script(src='http://code.jquery.com/jquery-1.9.1.min.js')
   script(src='//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js')

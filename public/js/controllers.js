@@ -2,7 +2,7 @@
 
 /* Controllers */
 
-function altCtrl($scope, socket, $routeParams, $window, $location,store) {
+function altCtrl($scope, socket, $routeParams, $window, $location, store) {
 
   $scope.logged = false;
   var localstorage = store.get();
@@ -34,36 +34,53 @@ function listCtrl($scope, socket, $routeParams, $window) {
 }
 listCtrl.$inject = ['$scope', 'socket','$routeParams','$window'];
 
-function submitCtrl($scope,socket) {
+function submitCtrl($scope,socket,$location,store) {
 
-    $scope.phase2 = false;
+  // Steps management
+  $scope.phase2 = false;
+  $scope.togglePhase = function () {
+    $scope.phase2 = !$scope.phase2;
+  };
 
-	socket.on('post:ok', function(data) {
-		$scope.result = "OK !"
-	});
+  socket.on('post:ok', function(data) {
+    $scope.result = "OK !"
+  });
 
-	$scope.put = function () {
-		
-		var post = {
-			author: $scope.author,
-			title: $scope.title,
-			description: $scope.description, 
-			votes: 0,
-			link: $scope.link,
-			comments: [],
-			status: 'upc'
-		};
+  $scope.submit = function () {
 
-		$scope.action = 'Inserted ... ';
-		socket.emit('put:post', post);
+    // Submit Ctrl
+    var logged = false;
+    var user = null;
+    var session = null;
+    var localstorage = store.get();
 
-	};
+    if (localstorage.username) {
+      logged = true;
+      user = localstorage.username;
+      session = localstorage.session;
+    }
 
-    $scope.togglePhase = function () {
-        $scope.phase2 = !$scope.phase2;
+    if (!logged) {
+      $location.path('/login');
+    } else {
+
+      var post = {
+        title: $scope.title,
+        description: $scope.description,
+        link: $scope.link,
+      };
+
+      var info = {
+        user: user,
+        session: session
+      }
+
+      socket.emit('put:post', {post:post, info: info});
+      }
+
     };
 }
-submitCtrl.$inject = ['$scope','socket'];
+submitCtrl.$inject = ['$scope','socket','$location','store'];
 
 
 function detailCtrl($scope, socket, $routeParams) {

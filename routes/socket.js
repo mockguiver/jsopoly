@@ -16,8 +16,7 @@ var postModel = {
     link: String,
     comments: [
         {body: String, date: Date, author: String}
-    ],
-    status: String
+    ]
 };
 
 var userModel = {
@@ -34,22 +33,65 @@ var User = mongoose.model('User',userModel);
 
 module.exports = function (socket) {
 
-	Post.find({'status':'top'}, function (err,docs) {
-		socket.emit('init', docs);		
-	})
-
-
 	socket.on('chgfilter', function(data) {
-		Post.find({'status': data.status}, function (err,docs) {
-			socket.emit('chgfilter', docs);
-		});
-	})
+
+    if (data.status == 'top') {
+      Post
+        .where('votes').gte(25)
+        .limit(10)
+        .exec(function (err, docs) {
+          socket.emit('init', docs);
+        });
+    } else if (data.status == 'pop') {
+      Post
+        .where('votes').gte(100)
+        .limit(10)
+        .exec(function (err, docs) {
+          socket.emit('init', docs);
+        });
+    } else if (data.status == 'upc') {
+      Post
+        .where('votes').lte(25)
+        .limit(10)
+        .exec(function (err, docs) {
+          socket.emit('init', docs);
+        });
+    } else {
+      Post
+        .where('votes').gte(25)
+        .limit(10)
+        .exec(function (err, docs) {
+          socket.emit('init', docs);
+      });
+    }
+  });
 
 	socket.on('put:post', function(data) {
-		var post = new Post(data);
-		post.save();
-		socket.emit('post:ok',{});
-	})
+
+    var user = User.findOne({username: data.info.user}, function (err,user) {
+
+      if (err) {
+        socket.emit({error: true, errorcode:0, result: 'No user found'});
+      } else if (user.session != data.info.session) {
+        socket.emit({error: true, errorcode:1, result: "Session doesn't match"});
+      } else {
+
+        var postdata = {
+          author: data.info.user,
+          date: { type: Date, default: Date.now },
+          title: data.post.title,
+          description: data.post.description,
+          votes: 0,
+          link: data.post.link,
+          comments: []
+        }
+
+        var post = new Post(postdata);
+        post.save();
+        socket.emit('post:ok',{});
+      }
+    });
+	});
 
 	socket.on('get:post', function(data) {
 		Post.findById(data.id, function(err,doc) {

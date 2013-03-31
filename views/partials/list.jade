@@ -7,7 +7,7 @@ div.row-fluid(ng-repeat='item in list')
      br
      button.btn.btn-warning Vote
   div.span9
-    h2
+    div.posttitle
       a(href='{{item.link}}') {{item.title}}
-    small {{item.author}}
+    h4.text-warning {{item.author}}
     p {{item.description}}

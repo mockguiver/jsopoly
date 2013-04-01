@@ -37,6 +37,9 @@ angular.module('alt.services', []).
       },
       get: function () {
         return JSON.parse($window.localStorage.getItem('alt'));
+      },
+      del: function () {
+        $window.localStorage.removeItem('alt');
       }
     }
   });

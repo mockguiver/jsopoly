@@ -2,7 +2,7 @@
 
 /* Controllers */
 
-function altCtrl($scope, socket, $routeParams, $window, $location, store) {
+function altCtrl($scope, socket, $location, store) {
 
   $scope.logged = false;
   var localstorage = store.get();
@@ -16,10 +16,9 @@ function altCtrl($scope, socket, $routeParams, $window, $location, store) {
 
 		// if we are out of list view we return to that view
 		if ($location.path() != '/') { $location.path('/');	}
-
 	}
 }
-altCtrl.$inject = ['$scope', 'socket','$routeParams','$window','$location','store'];
+altCtrl.$inject = ['$scope', 'socket','$location','store'];
 
 function listCtrl($scope, socket, $routeParams, $window) {
 
@@ -30,6 +29,14 @@ function listCtrl($scope, socket, $routeParams, $window) {
 	socket.on('chgfilter', function(data) {
 		$scope.list = data;
 	});
+
+  socket.on('vote',function(data) {
+
+  });
+
+  $scope.vote = function(id) {
+    socket.emit('vote',{id:id});
+  }
 
 }
 listCtrl.$inject = ['$scope', 'socket','$routeParams','$window'];
@@ -69,7 +76,7 @@ function submitCtrl($scope,socket,$location,store) {
       var post = {
         title: $scope.title,
         description: $scope.description,
-        link: $scope.link,
+        link: $scope.link
       };
 
       var info = {
@@ -86,8 +93,6 @@ submitCtrl.$inject = ['$scope','socket','$location','store'];
 
 
 function detailCtrl($scope, socket, $routeParams) {
-
-
 
 	socket.on('get:post', function(data) {
 
@@ -120,13 +125,10 @@ function detailCtrl($scope, socket, $routeParams) {
 
     socket.emit('put:comment', commentData);
   };
-
-
-
 }
 detailCtrl.$inject = ['$scope','socket','$routeParams'];
 
-function loginCtrl($scope,$location, socket, store) {
+function loginCtrl($scope, socket, $location, store)  {
 
 	socket.on('login',function(data) {
     if (data.error) {
@@ -142,7 +144,7 @@ function loginCtrl($scope,$location, socket, store) {
 	};
 
 }
-loginCtrl.$inject = ['$scope', '$location','socket', 'store'];
+loginCtrl.$inject = ['$scope', 'socket','$location','store'];
 
 function registerCtrl($scope,socket,$routeParams,store) {
 
@@ -176,10 +178,24 @@ function registerCtrl($scope,socket,$routeParams,store) {
   }
 
 }
-loginCtrl.$inject = ['$scope','socket','$routeParams','store'];
+registerCtrl.$inject = ['$scope','socket','$routeParams','store'];
 
 
 function aboutCtrl($scope) {
 
 }
 aboutCtrl.$inject = ['$scope'];
+
+
+function profileCtrl($scope,socket,store,$location,$rootScope) {
+  $scope.logout = function () {
+    var session = store.get();
+    if (session) {
+      socket.emit('logout',session);
+      store.del();
+      $rootScope.logged = false;
+      $location.url('/');
+    }
+  };
+}
+profileCtrl.$inject = ['$scope','socket','store','$location','$rootScope'];

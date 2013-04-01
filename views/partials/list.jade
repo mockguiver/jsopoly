@@ -3,9 +3,9 @@ div.page-header
 
 div.row-fluid(ng-repeat='item in list')
   div.span1.vote
-     | {{item.votes}}
+     p {{item.votes}}
      br
-     button.btn.btn-warning Vote
+     button.btn.btn-warning(ng-click='vote(item.id)') Vote
   div.span10
     div.posttitle
       a(href='{{item.link}}') {{item.title}}

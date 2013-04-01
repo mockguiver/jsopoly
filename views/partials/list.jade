@@ -6,8 +6,10 @@ div.row-fluid(ng-repeat='item in list')
      | {{item.votes}}
      br
      button.btn.btn-warning Vote
-  div.span9
+  div.span10
     div.posttitle
       a(href='{{item.link}}') {{item.title}}
     h4.text-warning {{item.author}}
     p {{item.description}}
+    div
+      a.text-warning(ng-href="detail/{{item.slug}}") {{item.comments.length}} Comments

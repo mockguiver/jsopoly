@@ -6,7 +6,7 @@ function altCtrl($scope, socket, $routeParams, $window, $location, store) {
 
   $scope.logged = false;
   var localstorage = store.get();
-  if (localstorage.username) {
+  if (localstorage && localstorage.username) {
     $scope.logged = true;
     $scope.user = localstorage.username;
   }
@@ -42,8 +42,10 @@ function submitCtrl($scope,socket,$location,store) {
     $scope.phase2 = !$scope.phase2;
   };
 
-  socket.on('post:ok', function(data) {
-    $scope.result = "OK !"
+  socket.on('put:post', function(data) {
+    if (!data.error) {
+      $location.path('/');
+    }
   });
 
   $scope.submit = function () {
@@ -85,6 +87,8 @@ submitCtrl.$inject = ['$scope','socket','$location','store'];
 
 function detailCtrl($scope, socket, $routeParams) {
 
+
+
 	socket.on('get:post', function(data) {
 
 		$scope.id = data._id;
@@ -94,22 +98,42 @@ function detailCtrl($scope, socket, $routeParams) {
 		$scope.description = data.description; 
 		$scope.votes = data.votes;
 		$scope.link = data.link;
+    $scope.slug = data.slug;
 		$scope.comments = data.comments;
 
 	});
 
 	socket.emit('get:post', {id: $routeParams.id});
-}
-detailCtrl.$inject = ['$scope', 'socket','$routeParams'];
 
-function loginCtrl($scope,socket,$routeParams,store,$location) {
+  socket.on('put:comment', function (data) {
+     if (!data.error) {
+       $scope.comments.push({body:$scope.comment,author:$scope.author});
+     }
+  });
+
+  $scope.submitComment = function () {
+    var commentData = {
+      id: $scope.id,
+      author: $scope.author,
+      body: $scope.textComment
+    };
+
+    socket.emit('put:comment', commentData);
+  };
+
+
+
+}
+detailCtrl.$inject = ['$scope','socket','$routeParams'];
+
+function loginCtrl($scope,$location, socket, store) {
 
 	socket.on('login',function(data) {
     if (data.error) {
       $scope.result = data.result;
     } else {
       store.save({username: data.username,session: data.session});
-      location.path('/');
+      $location.path('/');
     }
   });
 
@@ -118,7 +142,7 @@ function loginCtrl($scope,socket,$routeParams,store,$location) {
 	};
 
 }
-loginCtrl.$inject = ['$scope','socket','$routeParams','store','$location'];
+loginCtrl.$inject = ['$scope', '$location','socket', 'store'];
 
 function registerCtrl($scope,socket,$routeParams,store) {
 

@@ -4,7 +4,9 @@
 
 // Required libraries
 var mongoose = require('mongoose');
+var tools = require('./tools');
 mongoose.connect('localhost', '_altDB');
+
 
 // Schema
 var postModel = {
@@ -14,8 +16,9 @@ var postModel = {
     description: String,
     votes: Number,
     link: String,
+    slug: String,
     comments: [
-        {body: String, date: Date, author: String}
+        {body: String, author: String}
     ]
 };
 
@@ -71,9 +74,9 @@ module.exports = function (socket) {
     var user = User.findOne({username: data.info.user}, function (err,user) {
 
       if (err) {
-        socket.emit({error: true, errorcode:0, result: 'No user found'});
+        socket.emit('put:post',{error: true, errorcode:0, result: 'No user found'});
       } else if (user.session != data.info.session) {
-        socket.emit({error: true, errorcode:1, result: "Session doesn't match"});
+        socket.emit('put:post',{error: true, errorcode:1, result: "Session doesn't match"});
       } else {
 
         var postdata = {
@@ -83,21 +86,41 @@ module.exports = function (socket) {
           description: data.post.description,
           votes: 0,
           link: data.post.link,
+          slug: tools.str2slug(data.post.title),
           comments: []
         }
 
         var post = new Post(postdata);
         post.save();
-        socket.emit('post:ok',{});
+        socket.emit('put:post',{});
       }
     });
 	});
 
+  socket.on('put:comment', function (data) {
+    Post.findById(data.id,function(err,post) {
+      if (err) {
+        socket.emit('put:comment',{error: true});
+      } else {
+        var commentData = {
+          body : data.body,
+          author: data.author
+        }
+
+        post.comments.push(commentData);
+        post.save();
+
+        socket.emit('put:comment', {error: false});
+      };
+    });
+  });
+
+
 	socket.on('get:post', function(data) {
-		Post.findById(data.id, function(err,doc) {
+    Post.findOne({slug:data.id}, function(err,doc) {
 			socket.emit('get:post', doc);
-		})
-	})
+		});
+	});
 
 	socket.on('login', function(data) {
         User.findOne({username:data.username}, function (err,user) {

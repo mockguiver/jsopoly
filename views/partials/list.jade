@@ -3,7 +3,7 @@ div.page-header
 
 div.row-fluid(ng-repeat='item in list')
   div.span1.vote
-     p {{item.votes}}
+     | {{item.votes}}
      br
      button.btn.btn-warning(ng-click='vote(item.id)') Vote
   div.span10

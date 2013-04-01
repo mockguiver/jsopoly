@@ -135,6 +135,7 @@ function loginCtrl($scope, socket, $location, store)  {
       $scope.result = data.result;
     } else {
       store.save({username: data.username,session: data.session});
+      $scope.$parent.logged = true;
       $location.path('/');
     }
   });
@@ -187,15 +188,15 @@ function aboutCtrl($scope) {
 aboutCtrl.$inject = ['$scope'];
 
 
-function profileCtrl($scope,socket,store,$location,$rootScope) {
+function profileCtrl($scope,socket,store,$location) {
   $scope.logout = function () {
     var session = store.get();
     if (session) {
       socket.emit('logout',session);
       store.del();
-      $rootScope.logged = false;
+      $scope.$parent.logged = false;
       $location.url('/');
     }
   };
 }
-profileCtrl.$inject = ['$scope','socket','store','$location','$rootScope'];
+profileCtrl.$inject = ['$scope','socket','store','$location'];

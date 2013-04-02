@@ -11,7 +11,7 @@ angular.module('alt.services', []).
     var socket = io.connect();
     return {
       on: function (eventName, callback) {
-        socket.on(eventName, function () {  
+        socket.on(eventName, function () {
           var args = arguments;
           $rootScope.$apply(function () {
             callback.apply(socket, args);
@@ -32,14 +32,40 @@ angular.module('alt.services', []).
   }).
   factory('store',function ($window) {
     return {
-      save: function (item) {
-        $window.localStorage.setItem('alt',JSON.stringify(item));
+      save: function (key,item) {
+        $window.localStorage.setItem(key,JSON.stringify(item));
       },
-      get: function () {
-        return JSON.parse($window.localStorage.getItem('alt'));
+      get: function (key) {
+        return JSON.parse($window.localStorage.getItem(key));
       },
-      del: function () {
+      del: function (key) {
         $window.localStorage.removeItem('alt');
       }
     }
+  }).
+  factory('session',function (store) {
+
+    var logged = false;
+    var username = null;
+    var key = null;
+
+    var mysession = store.get('altSession');
+
+    if (mysession && mysession.username) {
+      logged = true;
+      username = mysession.username;
+      key = mysession.key;
+    }
+
+    var save = function (data) {
+      store.save('altSession',{username:data.username, key: data.key});
+    };
+
+    return {
+      logged: logged,
+      username: username,
+      key:key,
+      save: save
+    }
   });
+

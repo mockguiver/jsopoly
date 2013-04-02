@@ -21,6 +21,6 @@ div.row-fluid
       | <a href='login'> login </a> or <a href='register'> register </a> to post comments
 
     blockquote(ng-repeat='comment in comments')
-      p.text-info {{comment.author}} - {{comment.date}}
-      p {{comment.body}}
+      small.text-info {{comment.author}} - {{comment.date}}
+      small {{comment.body}}
 

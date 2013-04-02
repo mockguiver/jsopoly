@@ -2,46 +2,39 @@
 
 /* Controllers */
 
-function altCtrl($scope, socket, $location, store) {
+function altCtrl($scope, socket, $location, session) {
 
-  $scope.logged = false;
-  var localstorage = store.get();
-  if (localstorage && localstorage.username) {
-    $scope.logged = true;
-    $scope.user = localstorage.username;
+  $scope.logged = session.logged;
+  $scope.username = session.username;
+
+  $scope.sync = function (view) {
+    socket.emit('get:posts', {view: view});
+    $location.path('/');
   }
-
-	$scope.sync = function (status) {
-		socket.emit('chgfilter', {status: status});
-
-		// if we are out of list view we return to that view
-		if ($location.path() != '/') { $location.path('/');	}
-	}
 }
-altCtrl.$inject = ['$scope', 'socket','$location','store'];
+altCtrl.$inject = ['$scope', 'socket','$location','session'];
 
 function listCtrl($scope, socket, $routeParams, $window) {
 
-	socket.on('init', function(data) {
-		$scope.list = data;
-	});
+  socket.on('get:posts:result', function(data) {
+    $scope.list = data;
+  });
 
-	socket.on('chgfilter', function(data) {
-		$scope.list = data;
-	});
-
-  socket.on('vote',function(data) {
-
+  socket.on('submit:vote:result',function(data) {
+    // TODO ABM Votes
   });
 
   $scope.vote = function(id) {
-    socket.emit('vote',{id:id});
+    socket.emit('submit:vote',{id:id});
   }
 
+  socket.emit('get:posts',{view:'top'});
 }
 listCtrl.$inject = ['$scope', 'socket','$routeParams','$window'];
 
-function submitCtrl($scope,socket,$location,store) {
+function submitCtrl($scope,socket,$location,session) {
+
+  if (!session.logged) $location.path('/login');
 
   // Steps management
   $scope.phase2 = false;
@@ -49,70 +42,56 @@ function submitCtrl($scope,socket,$location,store) {
     $scope.phase2 = !$scope.phase2;
   };
 
-  socket.on('put:post', function(data) {
+  socket.on('submit:post:result', function(data) {
     if (!data.error) {
-      $location.path('/');
+      $location.path('/detail/' + data.id);
     }
   });
 
   $scope.submit = function () {
 
-    // Submit Ctrl
-    var logged = false;
-    var user = null;
-    var session = null;
-    var localstorage = store.get();
-
-    if (localstorage.username) {
-      logged = true;
-      user = localstorage.username;
-      session = localstorage.session;
-    }
-
-    if (!logged) {
-      $location.path('/login');
-    } else {
-
-      var post = {
-        title: $scope.title,
-        description: $scope.description,
-        link: $scope.link
-      };
-
-      var info = {
-        user: user,
-        session: session
-      }
-
-      socket.emit('put:post', {post:post, info: info});
-      }
-
+    var post = {
+      title: $scope.title,
+      description: $scope.description,
+      link: $scope.link
     };
+
+    var info = {
+      username: session.username,
+      key: session.key
+    };
+    socket.emit('submit:post', {post:post, info: info});
+  }
 }
-submitCtrl.$inject = ['$scope','socket','$location','store'];
+submitCtrl.$inject = ['$scope','socket','$location','session'];
 
 
 function detailCtrl($scope, socket, $routeParams) {
 
-	socket.on('get:post', function(data) {
+  socket.on('get:post:result', function(data) {
 
-		$scope.id = data._id;
-		$scope.author = data.author;
-		$scope.date = data.date;
-		$scope.title = data.title;
-		$scope.description = data.description; 
-		$scope.votes = data.votes;
-		$scope.link = data.link;
+    $scope.id = data._id;
+    $scope.author = data.author;
+    $scope.date = data.date;
+    $scope.title = data.title;
+    $scope.description = data.description;
+    $scope.votes = data.votes;
+    $scope.link = data.link;
+    $scope.anonymous = data.anonymous;
     $scope.slug = data.slug;
-		$scope.comments = data.comments;
+    $scope.comments = data.comments;
 
-	});
+  });
 
-	socket.emit('get:post', {id: $routeParams.id});
+  socket.on('submit:vote:result',function(data) {
+    // TODO ABM Todos
+  });
 
-  socket.on('put:comment', function (data) {
+  socket.emit('get:post', {id: $routeParams.id});
+
+  socket.on('submit:comment:result', function (data) {
      if (!data.error) {
-       $scope.comments.push({body:$scope.comment,author:$scope.author});
+       $scope.comments.push({body:$scope.textComment,author:$scope.author});
      }
   });
 
@@ -123,35 +102,39 @@ function detailCtrl($scope, socket, $routeParams) {
       body: $scope.textComment
     };
 
-    socket.emit('put:comment', commentData);
+    socket.emit('submit:comment', commentData);
   };
 }
 detailCtrl.$inject = ['$scope','socket','$routeParams'];
 
-function loginCtrl($scope, socket, $location, store)  {
+function loginCtrl($scope, socket, $location, session)  {
 
-	socket.on('login',function(data) {
+  socket.on('submit:login:result',function(data) {
     if (data.error) {
       $scope.result = data.result;
     } else {
-      store.save({username: data.username,session: data.session});
+      session.save(data);
       $scope.$parent.logged = true;
+      $scope.$parent.username = data.username;
+      session.logged = true;
+      session.username = data.username;
       $location.path('/');
     }
   });
 
-	$scope.login = function () {
-		socket.emit('login',{username:$scope.username, password: $scope.password});
-	};
+  $scope.login = function () {
+    socket.emit('submit:login',{username:$scope.username, password: $scope.password});
+  };
 
 }
-loginCtrl.$inject = ['$scope', 'socket','$location','store'];
+loginCtrl.$inject = ['$scope', 'socket','$location','session'];
 
-function registerCtrl($scope,socket,$routeParams,store) {
+function registerCtrl($scope,socket,$location) {
 
-  socket.on('register', function (data) {
-    $scope.action = 'Registered ...';
-    $scope.result = data.result;
+  socket.on('submit:register:result', function (data) {
+    if (!data.error) {
+      $location.path('/login');
+    }
   });
 
   var checkEmail = function () {
@@ -174,12 +157,12 @@ function registerCtrl($scope,socket,$routeParams,store) {
     var passwordChecked = checkPassword();
 
     if (mailChecked && passwordChecked) {
-      socket.emit('register',{username:$scope.username, password: $scope.password,email: $scope.email});
+      socket.emit('submit:register',{username:$scope.username, password: $scope.password,email: $scope.email});
     }
   }
 
 }
-registerCtrl.$inject = ['$scope','socket','$routeParams','store'];
+registerCtrl.$inject = ['$scope','socket','$location'];
 
 
 function aboutCtrl($scope) {

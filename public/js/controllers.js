@@ -34,7 +34,10 @@ listCtrl.$inject = ['$scope', 'socket','$routeParams','$window'];
 
 function submitCtrl($scope,socket,$location,session) {
 
-  if (!session.logged) $location.path('/login');
+  if (!session.logged) {
+    session.origin = '/submit';
+    $location.path('/login');
+  }
 
   // Steps management
   $scope.phase2 = false;
@@ -44,7 +47,7 @@ function submitCtrl($scope,socket,$location,session) {
 
   socket.on('submit:post:result', function(data) {
     if (!data.error) {
-      $location.path('/detail/' + data.id);
+      $location.path('/detail/' + data.slug);
     }
   });
 
@@ -118,7 +121,7 @@ function loginCtrl($scope, socket, $location, session)  {
       $scope.$parent.username = data.username;
       session.logged = true;
       session.username = data.username;
-      $location.path('/');
+      $location.path(session.origin);
     }
   });
 
@@ -171,15 +174,14 @@ function aboutCtrl($scope) {
 aboutCtrl.$inject = ['$scope'];
 
 
-function profileCtrl($scope,socket,store,$location) {
+function profileCtrl($scope,socket,session,$location) {
   $scope.logout = function () {
-    var session = store.get();
-    if (session) {
-      socket.emit('logout',session);
-      store.del();
-      $scope.$parent.logged = false;
-      $location.url('/');
+    session.del();
+    session.logged=false;
+    session.user = null;
+    session.key = null;
+    $scope.$parent.logged = false;
+    $location.url('/');
     }
-  };
 }
-profileCtrl.$inject = ['$scope','socket','store','$location'];
+profileCtrl.$inject = ['$scope','socket','session','$location'];

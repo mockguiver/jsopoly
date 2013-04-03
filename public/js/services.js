@@ -39,7 +39,7 @@ angular.module('alt.services', []).
         return JSON.parse($window.localStorage.getItem(key));
       },
       del: function (key) {
-        $window.localStorage.removeItem('alt');
+        $window.localStorage.removeItem(key);
       }
     }
   }).
@@ -48,6 +48,7 @@ angular.module('alt.services', []).
     var logged = false;
     var username = null;
     var key = null;
+    var origin = '/';
 
     var mysession = store.get('altSession');
 
@@ -61,11 +62,16 @@ angular.module('alt.services', []).
       store.save('altSession',{username:data.username, key: data.key});
     };
 
+    var del = function () {
+      store.del('altSession');
+    }
+
     return {
       logged: logged,
       username: username,
       key:key,
-      save: save
+      save: save,
+      del:del
     }
   });
 

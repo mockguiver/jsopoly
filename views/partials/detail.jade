@@ -5,7 +5,7 @@ div.row-fluid
   div.span1.vote
     | {{votes}}
     br
-    button.btn.btn-warning Vote
+    button.btn.btn-warning(ng-click='vote()') Vote
   div.span9
     h2
       a(href='{{item.link}}') {{title}}

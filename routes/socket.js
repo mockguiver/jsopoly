@@ -3,6 +3,7 @@
 // Required libraries
 var mongoose = require('mongoose');
 mongoose.connect('localhost', '_altDB');
+var tools = require('./tools');
 
 
 // Schema
@@ -43,14 +44,14 @@ module.exports = function (socket) {
         .exec(function (err, docs) {
           socket.emit('get:posts:result', docs);
         });
-    } else if (data.status == 'pop') {
+    } else if (data.view == 'pop') {
       Post
         .where('votes').gte(100)
         .limit(10)
         .exec(function (err, docs) {
           socket.emit('get:posts:result', docs);
         });
-    } else if (data.status == 'upc') {
+    } else if (data.view == 'upc') {
       Post
         .where('votes').lte(25)
         .limit(10)
@@ -92,7 +93,7 @@ module.exports = function (socket) {
 
         var post = new Post(postdata);
         post.save();
-        socket.emit('submit:post:result',{error:false,id:post._id});
+        socket.emit('submit:post:result',{error:false,slug:post.slug});
       }
     });
   });
@@ -126,7 +127,7 @@ module.exports = function (socket) {
     User.findOne({username:data.username}, function (err,user) {
       if (!err && user) {
         if (user.password != data.password) {
-            socket.emit('login', {error: true, result: 'Error - Wrong password'});
+            socket.emit('submit:login:result', {error: true, result: 'Error - Wrong password'});
         } else {
             user.key = 'inventedsession';
             user.save();

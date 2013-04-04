@@ -43,17 +43,11 @@ block body
                 a(href='about') What's Jsopoly?
               p Jsopoly is a Javascript community driven site to share news, experiences and informacion in a digg's style
             div
-              p.sectiontitle Latest Comments
-              ul
-                li comment1
-                li comment2
-                li comment3
-            div
               p.sectiontitle Upcoming News
-              ul
-                li Post 1
-                li Post 2
-                li Post 3
+              ul.unstyled
+                li(ng-repeat='post in lastPosts')
+                  a(ng-ref='detail/ + {{post.slug}}') [{{post.author}}] {{post.title}}
+
 
   script(src='http://code.jquery.com/jquery-1.9.1.min.js')
   script(src='//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js')

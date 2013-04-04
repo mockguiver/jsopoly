@@ -17,7 +17,11 @@ var postModel = {
     slug: String,
     anonymous: Number,
     comments: [
-        {body: String, author: String}
+        {
+          body: String,
+          author: String,
+          date:{ type: Date, default: Date.now }
+        }
     ]
 };
 
@@ -138,6 +142,16 @@ module.exports = function (socket) {
       }
     })
   })
+
+  socket.on('get:last:posts', function(data) {
+    Post
+      .where('votes').lte(25)
+      .limit(5)
+      .exec(function(err,docs) {
+        if (!err)
+          socket.emit('get:last:posts:result',{error:false,posts: docs});
+      });
+  });
 
   socket.on('submit:register', function(data) {
     data.karma=0;

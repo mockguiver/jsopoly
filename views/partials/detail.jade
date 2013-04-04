@@ -6,21 +6,21 @@ div.row-fluid
     | {{votes}}
     br
     button.btn.btn-warning(ng-click='vote()') Vote
-  div.span9
-    h2
+  div.span10
+    div.posttitle
       a(href='{{item.link}}') {{title}}
-    h4.text-warning {{author}}
+    div.authorname.text-warning {{author}}
     p {{description}}
     hr
     form(ng-show='logged')
       label Submit a comment
-      textarea(ng-model='textComment')
+      textarea(cols='200', ng-model='textComment')
       div
         button.btn.btn-primary(ng-click='submitComment()') Comment
     blockquote(ng-hide='logged')
       | <a href='login'> login </a> or <a href='register'> register </a> to post comments
 
     blockquote(ng-repeat='comment in comments')
-      small.text-info {{comment.author}} - {{comment.date}}
-      small {{comment.body}}
+      div.comment-text.text-warning {{comment.author}} - {{comment.date}}
+      div.comment-text {{comment.body}}
 

@@ -7,10 +7,17 @@ function altCtrl($scope, socket, $location, session) {
   $scope.logged = session.logged;
   $scope.username = session.username;
 
+  socket.on('get:last:posts:result', function (data) {
+    if (!data.error)
+      $scope.lastPosts = data.posts;
+  });
+
   $scope.sync = function (view) {
     socket.emit('get:posts', {view: view});
     $location.path('/');
   }
+
+  socket.emit('get:last:posts',{});
 }
 altCtrl.$inject = ['$scope', 'socket','$location','session'];
 

@@ -34,8 +34,18 @@
     font-size:1.4em;
     padding:0 0 4px 0;
     border-bottom:1px solid #ddd;
+    margin-bottom: 6px;
 }
 
 .posttitle {
-    font-size:1.4em;
+    font-size:1.2em;
+    margin-top: 10px;
+}
+
+.authorname {
+    font-size: 0.8em;
+}
+
+.authorname {
+    font-size: 0.8em;
 }

@@ -5,6 +5,7 @@
 
 var express = require('express'),
   routes = require('./routes'),
+  oauth = require('oauth'),
   socket = require('./routes/socket.js');
 
 var app = module.exports = express();

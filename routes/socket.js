@@ -1,40 +1,10 @@
 
 
-// Required libraries
-var mongoose = require('mongoose');
-mongoose.connect('localhost', '_altDB');
+
+// Libs
+
 var tools = require('./tools');
-
-
-// Schema
-var postModel = {
-    author: String,
-    date: { type: Date, default: Date.now },
-    title: String,
-    description: String,
-    votes: Number,
-    link: String,
-    slug: String,
-    anonymous: Number,
-    comments: [
-        {
-          body: String,
-          author: String,
-          date:{ type: Date, default: Date.now }
-        }
-    ]
-};
-
-var userModel = {
-    username: String,
-    password: String,
-    karma: Number,
-    key: String
-}
-
-// Models
-var Post = mongoose.model('Post',postModel);
-var User = mongoose.model('User',userModel);
+var db = require('../db/data');
 
 
 module.exports = function (socket) {
@@ -42,28 +12,28 @@ module.exports = function (socket) {
   socket.on('get:posts', function(data) {
 
     if (data.view == 'top') {
-      Post
+      db.Post
         .where('votes').gte(25)
         .limit(10)
         .exec(function (err, docs) {
           socket.emit('get:posts:result', docs);
         });
     } else if (data.view == 'pop') {
-      Post
+      db.Post
         .where('votes').gte(100)
         .limit(10)
         .exec(function (err, docs) {
           socket.emit('get:posts:result', docs);
         });
     } else if (data.view == 'upc') {
-      Post
+      db.Post
         .where('votes').lte(25)
         .limit(10)
         .exec(function (err, docs) {
           socket.emit('get:posts:result', docs);
         });
     } else {
-      Post
+      db.Post
         .where('votes').gte(25)
         .limit(10)
         .exec(function (err, docs) {
@@ -75,7 +45,7 @@ module.exports = function (socket) {
   socket.on('submit:post', function(data) {
 
     // TODO Karma ABM
-    var user = User.findOne({username: data.info.username}, function (err,user) {
+    var user = db.User.findOne({username: data.info.username}, function (err,user) {
 
       if (err) {
         socket.emit('submit:post:result',{error: true, errorcode:0, result: 'No user found'});
@@ -95,7 +65,7 @@ module.exports = function (socket) {
           comments: []
         }
 
-        var post = new Post(postdata);
+        var post = new db.Post(postdata);
         post.save();
         socket.emit('submit:post:result',{error:false,slug:post.slug});
       }
@@ -103,7 +73,7 @@ module.exports = function (socket) {
   });
 
   socket.on('submit:comment', function (data) {
-    Post.findById(data.id,function(err,post) {
+    db.Post.findById(data.id,function(err,post) {
       if (err) {
         socket.emit('submit:comment:result',{error: true});
       } else {
@@ -122,13 +92,13 @@ module.exports = function (socket) {
 
 
   socket.on('get:post', function(data) {
-    Post.findOne({slug:data.id}, function(err,doc) {
+    db.Post.findOne({slug:data.id}, function(err,doc) {
       socket.emit('get:post:result', doc);
     });
   });
 
   socket.on('submit:login', function(data) {
-    User.findOne({username:data.username}, function (err,user) {
+    db.User.findOne({username:data.username}, function (err,user) {
       if (!err && user) {
         if (user.password != data.password) {
             socket.emit('submit:login:result', {error: true, result: 'Error - Wrong password'});
@@ -144,7 +114,7 @@ module.exports = function (socket) {
   })
 
   socket.on('get:last:posts', function(data) {
-    Post
+    db.Post
       .where('votes').lte(25)
       .limit(5)
       .exec(function(err,docs) {
@@ -156,7 +126,7 @@ module.exports = function (socket) {
   socket.on('submit:register', function(data) {
     data.karma=0;
     data.key = 'logged';
-    var user = new User(data);
+    var user = new db.User(data);
     user.save();
 
     socket.emit('submit:register:result',{error:false});

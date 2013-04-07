@@ -1,4 +1,8 @@
 div.page-header
   h2 Profile
 div
+  p Username {{username}}
+  | karma <span class="badge badge-success"> {{karma}} </span>
+hr
+div
   button.btn.btn-danger(ng-click='logout()') Logout

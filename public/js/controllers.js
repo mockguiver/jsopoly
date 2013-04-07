@@ -59,7 +59,7 @@ function listCtrl($scope, socket, $location, session) {
   });
 
   $scope.vote = function(id) {
-    socket.emit('submit:vote',{id:id,author:session.username});
+    socket.emit('submit:vote',{id:id,voter:session.username});
   };
 
 
@@ -132,7 +132,7 @@ function detailCtrl($scope, socket, $routeParams,session) {
   });
 
   $scope.vote = function(id) {
-    socket.emit('submit:vote',{id:id,author:session.username});
+    socket.emit('submit:vote',{id:id,voter:session.username});
   };
 
   socket.emit('get:post', {id: $routeParams.id});
@@ -238,6 +238,15 @@ function profileCtrl($scope,socket,session,$location) {
     session.key = null;
     $scope.$parent.logged = false;
     $location.url('/');
+    };
+
+  socket.on('get:userdata:result', function (data) {
+    if (!data.error) {
+      $scope.username = data.username;
+      $scope.karma = data.karma;
     }
+  });
+
+  socket.emit('get:userdata', {username: session.username});
 }
 profileCtrl.$inject = ['$scope','socket','session','$location'];

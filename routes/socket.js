@@ -198,16 +198,16 @@ module.exports = function (socket) {
       return result;
     };
 
-    var authorid = null;
-    db.User.findOne({username:data.author}, function (err, user) {
+    var voterid = null;
+    db.User.findOne({username:data.voter}, function (err, user) {
       if (!err) {
         if (user && user.username) {
-          authorid = user.username;
+          voterid = user.username;
         }
 
       db.Post.findById(data.id,function(err, post) {
-        if (!err) {
-          if (authorid == null) {
+        if (!err && post != null) {
+          if (voterid == null) {
             if (post.anonymous >= 20) {
               socket.emit('submit:vote:result',{error:true, id:post._id, result:"Too much anonymous votes !"})
               return;
@@ -222,11 +222,26 @@ module.exports = function (socket) {
             user.save();
           }
 
+          db.User.findOne({username:post.author}, function (err, author) {
+             if (!err && author != null) {
+               author.karma++;
+               author.save();
+             }
+          });
+
           post.votes++;
           post.save();
           socket.broadcast.emit('submit:vote:result',{error:false, id: post._id});
         }
       });
+      }
+    })
+  });
+
+  socket.on('get:userdata', function(data) {
+    db.User.findOne({username:data.username},function (err, user) {
+      if (!err && user!=null) {
+        socket.emit('get:userdata:result',{username:user.username, karma:user.karma});
       }
     })
   });

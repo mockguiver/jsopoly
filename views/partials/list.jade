@@ -7,6 +7,9 @@ div.row-fluid(ng-repeat='item in list')
      br
      button.btn.btn-warning(ng-click='vote(item._id)') Vote
   div.span10
+    div.alert.alert-error.altalert(ng-show='item.errorOnVote')
+      button.close(type='button',data-dismiss='alert') &times;
+      p {{item.errorType}}
     div.posttitle
       a(href='{{item.link}}') {{item.title}}
     div.authorname.muted {{item.author}} - {{item.date | date:'dd/MM/yyyy hh:mm:ss'}} - {{item.link}}

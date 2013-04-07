@@ -28,33 +28,43 @@ function altCtrl($scope, socket, $location, session) {
 }
 altCtrl.$inject = ['$scope', 'socket','$location','session'];
 
-function listCtrl($scope, socket, $location) {
+function listCtrl($scope, socket, $location, session) {
 
   socket.on('get:posts:result', function(data) {
     $scope.list = data;
   });
 
   socket.on('submit:vote:result',function(data) {
-    if (!data.error) {
+
+    var index = (function () {
+      var result = -1;
       var i=0;
       while (i< $scope.list.length) {
         if ($scope.list[i]._id == data.id) {
-          $scope.list[i].votes++;
+          result = i;
           break;
         } else {
           i++;
         }
       }
+      return result;
+    })();
+
+    if (!data.error) {
+      $scope.list[index].votes++;
+    } else {
+      $scope.list[index].errorOnVote = true;
+      $scope.list[index].errorType = data.result;
     }
   });
 
   $scope.vote = function(id) {
-    socket.emit('submit:vote',{id:id});
+    socket.emit('submit:vote',{id:id,author:session.username});
   };
 
 
 }
-listCtrl.$inject = ['$scope', 'socket','$location'];
+listCtrl.$inject = ['$scope', 'socket','$location','session'];
 
 function submitCtrl($scope,socket,$location,session) {
 
@@ -93,7 +103,7 @@ function submitCtrl($scope,socket,$location,session) {
 submitCtrl.$inject = ['$scope','socket','$location','session'];
 
 
-function detailCtrl($scope, socket, $routeParams) {
+function detailCtrl($scope, socket, $routeParams,session) {
 
   socket.on('get:post:result', function(data) {
 
@@ -111,13 +121,18 @@ function detailCtrl($scope, socket, $routeParams) {
   });
 
   socket.on('submit:vote:result',function(data) {
+
     if (!data.error) {
       $scope.votes++;
+    } else {
+      $scope.errorOnVote = true;
+      $scope.errorType = data.result;
     }
+
   });
 
   $scope.vote = function(id) {
-    socket.emit('submit:vote',{id:id});
+    socket.emit('submit:vote',{id:id,author:session.username});
   };
 
   socket.emit('get:post', {id: $routeParams.id});
@@ -143,7 +158,7 @@ function detailCtrl($scope, socket, $routeParams) {
     socket.emit('submit:comment', {commentData:commentData, info:info});
   };
 }
-detailCtrl.$inject = ['$scope','socket','$routeParams'];
+detailCtrl.$inject = ['$scope','socket','$routeParams','session'];
 
 function loginCtrl($scope, socket, $location, session, mycrypto)  {
 
@@ -219,7 +234,7 @@ function profileCtrl($scope,socket,session,$location) {
   $scope.logout = function () {
     session.del();
     session.logged=false;
-    session.user = null;
+    session.username = null;
     session.key = null;
     $scope.$parent.logged = false;
     $location.url('/');

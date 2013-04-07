@@ -60,7 +60,10 @@ var userModel = {
   username: String,
   password: String,
   karma: Number,
-  key: String
+  key: String,
+  votes: [{
+    id: String
+  }]
 };
 
 // Models

@@ -167,23 +167,68 @@ module.exports = function (socket) {
     var decryptedData = tools.enc(data);
     var data = JSON.parse(decryptedData);
 
-    data.karma=0;
-    data.key = 'logged';
-    var user = new db.User(data);
-    user.save();
+    User.findOne({username:data.username}, function (err, user) {
+      if (!err) {
+        if (user == null) {
+          data.karma=0;
+          data.key = 'logged';
+          var user = new db.User(data);
+          user.save();
+          socket.emit('submit:register:result',{error:false});
+        } else {
+          socket.emit('submit:register:result',{error:true, result:'User exists in our Database'});
+        }
+      }
+    });
 
-    socket.emit('submit:register:result',{error:false});
   });
 
   socket.on('submit:vote', function (data) {
-    db.Post.findById(data.id,function(err, post) {
-      if (!err) {
-        post.votes++;
-        post.save();
-        socket.emit('submit:vote:result',{error:false, id: post._id});
-      }
-    });
-  });
 
+    var hasAlreadyVoted = function (vid,array) {
+      var result = false;
+      var i=0;
+      while (i<array.length) {
+        if (array[i].id == vid) {
+          result = true;
+          break
+        }
+        else i++;
+      }
+      return result;
+    };
+
+    var authorid = null;
+    db.User.findOne({username:data.author}, function (err, user) {
+      if (!err) {
+        if (user && user.username) {
+          authorid = user.username;
+        }
+
+      db.Post.findById(data.id,function(err, post) {
+        if (!err) {
+          if (authorid == null) {
+            if (post.anonymous >= 20) {
+              socket.emit('submit:vote:result',{error:true, id:post._id, result:"Too much anonymous votes !"})
+              return;
+            } else {
+              post.anonymous++;
+            }
+          } else if (hasAlreadyVoted(post._id,user.votes)) {
+            socket.emit('submit:vote:result',{error:true, id:post._id, result:"You've already voted !"})
+            return;
+          } else {
+            user.votes.push({id:post._id});
+            user.save();
+          }
+
+          post.votes++;
+          post.save();
+          socket.broadcast.emit('submit:vote:result',{error:false, id: post._id});
+        }
+      });
+      }
+    })
+  });
 
 };

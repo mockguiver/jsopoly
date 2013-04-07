@@ -30,6 +30,27 @@ angular.module('alt.services', []).
       }
     };
   }).
+  factory('mycrypto',function () {
+
+    function enc(str) {
+      var encoded = "";
+      for (var i=0; i<str.length;i++) {
+        var a = str.charCodeAt(i);
+        var b = a ^ 123;    // bitwise XOR with any number, e.g. 123
+        encoded = encoded+String.fromCharCode(b);
+      }
+      return encoded;
+    }
+
+    return {
+      encode: function (text) {
+        return enc(JSON.stringify(text))
+      },
+      decode: function (text) {
+          return enc(text)
+      }
+    }
+  }).
   factory('store',function ($window) {
     return {
       save: function (key,item) {

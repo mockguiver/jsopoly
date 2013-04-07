@@ -145,9 +145,13 @@ function detailCtrl($scope, socket, $routeParams) {
 }
 detailCtrl.$inject = ['$scope','socket','$routeParams'];
 
-function loginCtrl($scope, socket, $location, session)  {
+function loginCtrl($scope, socket, $location, session, mycrypto)  {
 
   socket.on('submit:login:result',function(data) {
+
+    var decryptedData = mycrypto.decode(data);
+    var data = JSON.parse(decryptedData);
+
     if (data.error) {
       $scope.result = data.result;
     } else {
@@ -161,13 +165,14 @@ function loginCtrl($scope, socket, $location, session)  {
   });
 
   $scope.login = function () {
-    socket.emit('submit:login',{username:$scope.username, password: $scope.password});
+    var encoded = mycrypto.encode({username:$scope.username, password: $scope.password});
+    socket.emit('submit:login',encoded);
   };
 
 }
-loginCtrl.$inject = ['$scope', 'socket','$location','session'];
+loginCtrl.$inject = ['$scope', 'socket','$location','session','mycrypto'];
 
-function registerCtrl($scope,socket,$location) {
+function registerCtrl($scope,socket,$location,mycrypto) {
 
   socket.on('submit:register:result', function (data) {
     if (!data.error) {
@@ -193,14 +198,15 @@ function registerCtrl($scope,socket,$location) {
 
     var mailChecked = checkEmail();
     var passwordChecked = checkPassword();
+    var encoded = mycrypto.encode({username:$scope.username, password: $scope.password,email: $scope.email});
 
     if (mailChecked && passwordChecked) {
-      socket.emit('submit:register',{username:$scope.username, password: $scope.password,email: $scope.email});
+      socket.emit('submit:register',encoded);
     }
   }
 
 }
-registerCtrl.$inject = ['$scope','socket','$location'];
+registerCtrl.$inject = ['$scope','socket','$location','mycrypto'];
 
 
 function aboutCtrl($scope) {

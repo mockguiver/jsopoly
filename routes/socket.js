@@ -120,18 +120,24 @@ module.exports = function (socket) {
   });
 
   socket.on('submit:login', function(data) {
+
+    var decryptedData = tools.enc(data);
+    var data = JSON.parse(decryptedData);
+    var encoded = null;
+
     db.User.findOne({username:data.username}, function (err,user) {
       if (!err && user) {
         if (user.password != data.password) {
-            socket.emit('submit:login:result', {error: true, result: 'Error - Wrong password'});
+          encoded = tools.enc(JSON.stringify({error: true, result: 'Error - Wrong password'}));
         } else {
-            user.key = 'inventedsession';
-            user.save();
-            socket.emit('submit:login:result', {error: false, username: data.username, key: user.key, result: 'OK!'});
+          user.key = 'inventedsession';
+          user.save();
+          encoded = tools.enc(JSON.stringify({error: false, username: data.username, key: user.key, result: 'OK!'}));
         }
       } else {
-        socket.emit('submit:login:result', {error:true, result: 'Error - no user found'});
+        encoded = tools.enc(JSON.stringify({error:true, result: 'Error - no user found'}));
       }
+      socket.emit('submit:login:result',encoded);
     })
   });
 
@@ -157,6 +163,10 @@ module.exports = function (socket) {
 
 
   socket.on('submit:register', function(data) {
+
+    var decryptedData = tools.enc(data);
+    var data = JSON.parse(decryptedData);
+
     data.karma=0;
     data.key = 'logged';
     var user = new db.User(data);

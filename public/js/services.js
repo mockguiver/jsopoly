@@ -49,6 +49,7 @@ angular.module('alt.services', []).
     var username = null;
     var key = null;
     var origin = '/';
+    var init = true;
 
     var mysession = store.get('altSession');
 
@@ -64,14 +65,15 @@ angular.module('alt.services', []).
 
     var del = function () {
       store.del('altSession');
-    }
+    };
 
     return {
       logged: logged,
       username: username,
       key:key,
       save: save,
-      del:del
+      del:del,
+      init: init
     }
   });
 

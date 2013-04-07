@@ -49,16 +49,25 @@ var postModel = {
   ]
 };
 
+var commentModel = {
+  slug: String,
+  author: String,
+  body: String,
+  date: { type: Date, default: Date.now }
+};
+
 var userModel = {
   username: String,
   password: String,
   karma: Number,
   key: String
-}
+};
 
 // Models
 var Post = mongoose.model('Post',postModel);
 var User = mongoose.model('User',userModel);
+var Comment = mongoose.model('Comment',commentModel);
 
 exports.Post = Post;
 exports.User = User;
+exports.Comment = Comment;

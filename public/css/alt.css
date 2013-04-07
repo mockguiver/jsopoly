@@ -35,6 +35,7 @@
     padding:0 0 4px 0;
     border-bottom:1px solid #ddd;
     margin-bottom: 6px;
+    margin-top:12px;
 }
 
 .posttitle {
@@ -43,9 +44,13 @@
 }
 
 .authorname {
-    font-size: 0.8em;
+    font-size: 0.9em;
 }
 
-.authorname {
-    font-size: 0.8em;
+.comment-link {
+    font-size: 0.9em;
+}
+
+.comment-text {
+    font-size: 0.9em;
 }

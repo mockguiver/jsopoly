@@ -1,5 +1,4 @@
-
-
+'use strict';
 
 // Libs
 
@@ -14,6 +13,7 @@ module.exports = function (socket) {
     if (data.view == 'top') {
       db.Post
         .where('votes').gte(25)
+        .sort('-votes')
         .limit(10)
         .exec(function (err, docs) {
           socket.emit('get:posts:result', docs);
@@ -22,6 +22,7 @@ module.exports = function (socket) {
       db.Post
         .where('votes').gte(100)
         .limit(10)
+        .sort('-votes')
         .exec(function (err, docs) {
           socket.emit('get:posts:result', docs);
         });
@@ -29,6 +30,7 @@ module.exports = function (socket) {
       db.Post
         .where('votes').lte(25)
         .limit(10)
+        .sort('-votes')
         .exec(function (err, docs) {
           socket.emit('get:posts:result', docs);
         });
@@ -36,6 +38,7 @@ module.exports = function (socket) {
       db.Post
         .where('votes').gte(25)
         .limit(10)
+        .sort('-votes')
         .exec(function (err, docs) {
           socket.emit('get:posts:result', docs);
       });
@@ -63,7 +66,7 @@ module.exports = function (socket) {
           anonymous: 0,
           slug: tools.str2slug(data.post.title),
           comments: []
-        }
+        };
 
         var post = new db.Post(postdata);
         post.save();
@@ -73,21 +76,40 @@ module.exports = function (socket) {
   });
 
   socket.on('submit:comment', function (data) {
-    db.Post.findById(data.id,function(err,post) {
+
+    var user = db.User.findOne({username: data.info.username}, function (err,user) {
       if (err) {
-        socket.emit('submit:comment:result',{error: true});
+        socket.emit('submit:comment:result',{error: true, errorcode:0, result: 'No user found'});
+      } else if (user.session != data.info.session) {
+        socket.emit('submit:comment:result',{error: true, errorcode:1, result: "Session doesn't match"});
       } else {
-        var commentData = {
-          body : data.body,
-          author: data.author
-        }
+        db.Post.findById(data.id,function(err,post) {
+          if (err) {
+            socket.emit('submit:comment:result',{error: true,errorcode:2,result: "Post not found"});
+          } else {
 
-        post.comments.push(commentData);
-        post.save();
+            var commentData = {
+              body : data.commentdata.body,
+              author: data.commentdata.author
+            };
 
-        socket.emit('submit:comment:result', {error: false});
-      };
-    });
+            post.comments.push(commentData);
+            post.save();
+
+            var commentLinkData = {
+              slug: post.slug,
+              author: post.author,
+              body: commentData.body.substr(0,30) + '...'
+            };
+
+            var commentLink = new db.Comment(commentLinkData);
+            commentLink.save();
+
+            socket.emit('submit:comment:result', {error: false});
+          }
+        });
+      }
+    })
   });
 
 
@@ -111,7 +133,7 @@ module.exports = function (socket) {
         socket.emit('submit:login:result', {error:true, result: 'Error - no user found'});
       }
     })
-  })
+  });
 
   socket.on('get:last:posts', function(data) {
     db.Post
@@ -123,6 +145,17 @@ module.exports = function (socket) {
       });
   });
 
+  socket.on('get:last:comments', function(data) {
+    db.Comment
+      .where('__v').equals(0)
+      .limit(5)
+      .exec(function(err,docs) {
+        if (!err)
+          socket.emit('get:last:comments:result',{error:false,comments: docs});
+      });
+  });
+
+
   socket.on('submit:register', function(data) {
     data.karma=0;
     data.key = 'logged';
@@ -130,6 +163,17 @@ module.exports = function (socket) {
     user.save();
 
     socket.emit('submit:register:result',{error:false});
-  })
+  });
+
+  socket.on('submit:vote', function (data) {
+    db.Post.findById(data.id,function(err, post) {
+      if (!err) {
+        post.votes++;
+        post.save();
+        socket.emit('submit:vote:result',{error:false, id: post._id});
+      }
+    });
+  });
+
 
 };

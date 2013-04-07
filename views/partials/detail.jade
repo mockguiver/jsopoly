@@ -5,7 +5,7 @@ div.row-fluid
   div.span1.vote
     | {{votes}}
     br
-    button.btn.btn-warning(ng-click='vote()') Vote
+    button.btn.btn-warning(ng-click='vote(id)') Vote
   div.span10
     div.posttitle
       a(href='{{item.link}}') {{title}}
@@ -21,6 +21,6 @@ div.row-fluid
       | <a href='login'> login </a> or <a href='register'> register </a> to post comments
 
     blockquote(ng-repeat='comment in comments')
-      div.comment-text.text-warning {{comment.author}} - {{comment.date}}
+      div.comment-text.text-warning {{comment.author}} - {{comment.date | date:'dd/MM/yyyy hh:mm:ss'}}
       div.comment-text {{comment.body}}
 

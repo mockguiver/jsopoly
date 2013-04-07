@@ -12,32 +12,49 @@ function altCtrl($scope, socket, $location, session) {
       $scope.lastPosts = data.posts;
   });
 
+  socket.on('get:last:comments:result', function (data) {
+    if (!data.error)
+      $scope.lastComments = data.comments;
+  });
+
   $scope.sync = function (view) {
     socket.emit('get:posts', {view: view});
-    $location.path('/');
-  }
+  };
 
   socket.emit('get:last:posts',{});
+  socket.emit('get:last:comments',{});
+  socket.emit('get:posts',{view:'top'});
+
 }
 altCtrl.$inject = ['$scope', 'socket','$location','session'];
 
-function listCtrl($scope, socket, $routeParams, $window) {
+function listCtrl($scope, socket, $location) {
 
   socket.on('get:posts:result', function(data) {
     $scope.list = data;
   });
 
   socket.on('submit:vote:result',function(data) {
-    // TODO ABM Votes
+    if (!data.error) {
+      var i=0;
+      while (i< $scope.list.length) {
+        if ($scope.list[i]._id == data.id) {
+          $scope.list[i].votes++;
+          break;
+        } else {
+          i++;
+        }
+      }
+    }
   });
 
   $scope.vote = function(id) {
     socket.emit('submit:vote',{id:id});
-  }
+  };
 
-  socket.emit('get:posts',{view:'top'});
+
 }
-listCtrl.$inject = ['$scope', 'socket','$routeParams','$window'];
+listCtrl.$inject = ['$scope', 'socket','$location'];
 
 function submitCtrl($scope,socket,$location,session) {
 
@@ -94,8 +111,14 @@ function detailCtrl($scope, socket, $routeParams) {
   });
 
   socket.on('submit:vote:result',function(data) {
-    // TODO ABM Todos
+    if (!data.error) {
+      $scope.votes++;
+    }
   });
+
+  $scope.vote = function(id) {
+    socket.emit('submit:vote',{id:id});
+  };
 
   socket.emit('get:post', {id: $routeParams.id});
 
@@ -112,7 +135,12 @@ function detailCtrl($scope, socket, $routeParams) {
       body: $scope.textComment
     };
 
-    socket.emit('submit:comment', commentData);
+    var info = {
+      username: session.username,
+      key: session.key
+    };
+
+    socket.emit('submit:comment', {commentData:commentData, info:info});
   };
 }
 detailCtrl.$inject = ['$scope','socket','$routeParams'];
@@ -152,14 +180,14 @@ function registerCtrl($scope,socket,$location) {
       $scope.mailError = 'Email not valid';
       return false;
     } else return true;
-  }
+  };
 
   var checkPassword = function () {
     if ($scope.password != $scope.vpassword) {
       $scope.pwdError = "Password don't match";
       return false;
     } else return true;
-  }
+  };
 
   $scope.register = function() {
 

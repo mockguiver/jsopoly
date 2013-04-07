@@ -192,6 +192,8 @@ function registerCtrl($scope,socket,$location,mycrypto) {
   socket.on('submit:register:result', function (data) {
     if (!data.error) {
       $location.path('/login');
+    } else {
+      $scope.userError = data.result;
     }
   });
 

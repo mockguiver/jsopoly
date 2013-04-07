@@ -167,7 +167,7 @@ module.exports = function (socket) {
     var decryptedData = tools.enc(data);
     var data = JSON.parse(decryptedData);
 
-    User.findOne({username:data.username}, function (err, user) {
+    db.User.findOne({username:data.username}, function (err, user) {
       if (!err) {
         if (user == null) {
           data.karma=0;

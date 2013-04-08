@@ -34,13 +34,13 @@ module.exports = function (socket) {
         .exec(function (err, docs) {
           socket.emit('get:posts:result', docs);
         });
-    } else {
+    } else { // Search   db.collection.find( { field : { $in : array } } );
       db.Post
-        .where('votes').gte(25)
-        .limit(10)
-        .sort('-votes')
-        .exec(function (err, docs) {
-          socket.emit('get:posts:result', docs);
+        .find({keywords: {$in: [data.view]}})
+        .exec(function(err, docs){
+        if (!err) {
+          socket.emit('get:posts:result',docs);
+        }
       });
     }
   });

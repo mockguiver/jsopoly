@@ -1,5 +1,6 @@
 // MongoDB Configuration
 var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
 if(process.env.VCAP_SERVICES){
   var env = JSON.parse(process.env.VCAP_SERVICES);
@@ -31,7 +32,7 @@ var mongourl = generate_mongo_url(mongo);
 mongoose.connect(mongourl);
 
 // Schema
-var postModel = {
+var postModel = new Schema({
   author: String,
   date: { type: Date, default: Date.now },
   title: String,
@@ -40,6 +41,7 @@ var postModel = {
   link: String,
   slug: String,
   anonymous: Number,
+  keywords: [String],
   comments: [
     {
       body: String,
@@ -47,16 +49,16 @@ var postModel = {
       date:{ type: Date, default: Date.now }
     }
   ]
-};
+});
 
-var commentModel = {
+var commentModel = new Schema({
   slug: String,
   author: String,
   body: String,
   date: { type: Date, default: Date.now }
-};
+});
 
-var userModel = {
+var userModel = new Schema ({
   username: String,
   password: String,
   karma: Number,
@@ -64,7 +66,24 @@ var userModel = {
   votes: [{
     id: String
   }]
-};
+});
+
+postModel.pre('save',function (next) {
+  // Tools for full text search
+  function extractKeywords(text) {
+    if (!text) return [];
+
+    return text.
+      split(/\s+/).
+      filter(function(v) { return v.length > 2; }).
+      filter(function(v, i, a) { return a.lastIndexOf(v) === i; });
+  }
+
+  this.keywords = extractKeywords(this.title + ' ' + this.description);
+
+  next();
+});
+
 
 // Models
 var Post = mongoose.model('Post',postModel);

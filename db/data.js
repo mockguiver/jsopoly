@@ -41,7 +41,7 @@ var postModel = new Schema({
   link: String,
   slug: String,
   anonymous: Number,
-  keywords: [String],
+  keywords: {type:[String],index:true},
   comments: [
     {
       body: String,

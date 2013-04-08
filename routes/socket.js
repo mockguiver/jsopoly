@@ -231,6 +231,7 @@ module.exports = function (socket) {
 
           post.votes++;
           post.save();
+          socket.emit('submit:vote:result',{error:false, id: post._id});
           socket.broadcast.emit('submit:vote:result',{error:false, id: post._id});
         }
       });

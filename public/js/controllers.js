@@ -59,6 +59,22 @@ function listCtrl($scope, socket, $location, session) {
   });
 
   $scope.vote = function(id) {
+
+    var index = (function () {
+      var result = -1;
+      var i=0;
+      while (i< $scope.list.length) {
+        if ($scope.list[i]._id == id) {
+          result = i;
+          break;
+        } else {
+          i++;
+        }
+      }
+      return result;
+    })();
+
+    $scope.list[index].cantvote=true;
     socket.emit('submit:vote',{id:id,voter:session.username});
   };
 
@@ -132,6 +148,8 @@ function detailCtrl($scope, socket, $routeParams,session) {
   });
 
   $scope.vote = function(id) {
+
+    $scope.cantvote = true;
     socket.emit('submit:vote',{id:id,voter:session.username});
   };
 

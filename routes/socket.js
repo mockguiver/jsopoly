@@ -83,14 +83,14 @@ module.exports = function (socket) {
       } else if (user.session != data.info.session) {
         socket.emit('submit:comment:result',{error: true, errorcode:1, result: "Session doesn't match"});
       } else {
-        db.Post.findById(data.id,function(err,post) {
+        db.Post.findById(data.commentData.id,function(err,post) {
           if (err) {
             socket.emit('submit:comment:result',{error: true,errorcode:2,result: "Post not found"});
           } else {
 
             var commentData = {
-              body : data.commentdata.body,
-              author: data.commentdata.author
+              body : data.commentData.body,
+              author: data.commentData.author
             };
 
             post.comments.push(commentData);

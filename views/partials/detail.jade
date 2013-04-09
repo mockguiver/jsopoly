@@ -5,7 +5,8 @@ div.row-fluid
   div.span1.vote
     | {{votes}}
     br
-    button.btn.btn-warning(ng-click='vote(id)') Vote
+    div(ng-hide='cantvote')
+      button.btn.btn-warning(ng-click='vote(id)') Vote
   div.span10
     div.alert.alert-error.altalert(ng-show='errorOnVote')
       button.close(type='button',data-dismiss='alert') &times;

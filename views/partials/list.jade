@@ -5,7 +5,8 @@ div.row-fluid(ng-repeat='item in list')
   div.span1.vote
      | {{item.votes}}
      br
-     button.btn.btn-warning(ng-click='vote(item._id)') Vote
+     div(ng-hide='item.cantvote')
+        button.btn.btn-warning(ng-click='vote(item._id)') Vote
   div.span10
     div.alert.alert-error.altalert(ng-show='item.errorOnVote')
       button.close(type='button',data-dismiss='alert') &times;
